@@ -1,4 +1,4 @@
-import { execSync } from "child_process";
+import { exec } from "child_process";
 
 export interface ObsidianCLIOptions {
   vaultPath: string;
@@ -28,7 +28,7 @@ export async function execObsidianCommand(
   const fullCommand = `${cliPath} ${command} ${argsStr} ${vaultArg}`.trim();
 
   return new Promise((resolve, reject) => {
-    execSync(fullCommand, { encoding: "utf-8" }, (error, stdout, stderr) => {
+    exec(fullCommand, { encoding: "utf-8", timeout: 15000 }, (error, stdout) => {
       if (error) {
         reject(new Error(`Obsidian CLI error: ${error.message}`));
       } else {
