@@ -17,12 +17,12 @@ import { existsSync } from "fs"
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
-export const ObsidianPlugin: Plugin = async (ctx) => {
+export const ObsidianPlugin: Plugin = async (ctx, options) => {
   return {
     config: async (config) => {
       // 1. Inject MCP server configuration
-      const vaultPath = process.env.OBSIDIAN_VAULT_PATH
-      const cliPath = process.env.OBSIDIAN_CLI_PATH || "obsidian"
+      const vaultPath = (options?.vaultPath as string | undefined) ?? process.env.OBSIDIAN_VAULT_PATH
+      const cliPath = (options?.cliPath as string | undefined) ?? process.env.OBSIDIAN_CLI_PATH ?? "obsidian"
       
       if (vaultPath) {
         const serverPath = path.join(__dirname, "dist", "server.js")
