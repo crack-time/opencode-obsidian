@@ -1,16 +1,10 @@
-import { execObsidianCommand, buildFlag, type ObsidianCLIOptions } from "../utils/obsidian.js";
+import { execObsidianCommand, type ObsidianCLIOptions } from "../utils/obsidian.js";
 
 export async function handleProperty(
   options: ObsidianCLIOptions,
-  args: {
-    action: "read" | "set" | "remove";
-    name: string;
-    file: string;
-    value?: string;
-    type?: "text" | "list" | "number" | "date" | "checkbox";
-  }
+  args: { name: string; file: string }
 ): Promise<{ content: { type: string; text: string }[] }> {
-  const { action, name, file, value, type } = args;
+  const { name, file } = args;
 
   if (!name) {
     throw new Error("name is required");
@@ -20,15 +14,28 @@ export async function handleProperty(
     throw new Error("file is required");
   }
 
-  const cmd = `property:${action}`;
-  const raw = await execObsidianCommand(options, cmd, {
-    name,
-    value,
-    type,
+  const raw = await execObsidianCommand(options, "properties", {
     file,
+    format: "json",
   });
 
-  return {
-    content: [{ type: "text", text: raw }],
-  };
+  let parsed: Record<string, any>;
+  try {
+    parsed = JSON.parse(raw);
+  } catch {
+    return {
+      content: [{ type: "text", text: `No frontmatter in ${file}` }],
+    };
+  }
+
+  if (!(name in parsed)) {
+    return {
+      content: [{ type: "text", text: `Property "${name}" not found in ${file}` }],
+    };
+  }
+
+  const value = parsed[name];
+  const text = typeof value === "string" ? value : JSON.stringify(value);
+
+  return { content: [{ type: "text", text }] };
 }

@@ -91,17 +91,14 @@ export function createServer(vaultPath: string, cliPath: string): Server {
       },
       {
         name: "obsidian_property",
-        description: "Manage frontmatter properties",
+        description: "Read a frontmatter property value from a file",
         inputSchema: {
           type: "object",
           properties: {
-            action: { type: "string", enum: ["read", "set", "remove"], description: "Action to perform" },
-            name: { type: "string", description: "Property name" },
+            name: { type: "string", description: "Property name to read" },
             file: { type: "string", description: "File name" },
-            value: { type: "string", description: "Property value (for set action)" },
-            type: { type: "string", enum: ["text", "list", "number", "date", "checkbox"], description: "Property type" },
           },
-          required: ["action", "name", "file"],
+          required: ["name", "file"],
         },
       },
       {
